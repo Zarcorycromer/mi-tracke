@@ -59,7 +59,7 @@
             color: var(--text-muted);
         }
 
-        /* Sección de Nombre de Usuario */
+        /* --- NOTA CSS: Estilos de la sección del nombre --- */
         .user-section {
             background-color: var(--bg-color);
             padding: 16px;
@@ -129,7 +129,7 @@
             display: block;
         }
 
-        /* Pestañas de Semanas */
+        /* --- NOTA CSS: Estilos de pestañas y barra de progreso --- */
         .tabs {
             display: flex;
             gap: 8px;
@@ -161,7 +161,6 @@
             background-color: rgba(255, 255, 255, 0.05);
         }
 
-        /* Progreso */
         .progress-container {
             margin-bottom: 24px;
         }
@@ -189,11 +188,25 @@
             transition: width 0.3s ease;
         }
 
-        /* Lista de Tareas */
+        /* --- NOTA CSS: Títulos de los Módulos / Materias --- */
+        .materia-title {
+            font-size: 1.05rem;
+            color: var(--accent-color);
+            margin-top: 20px;
+            margin-bottom: 10px;
+            padding-bottom: 4px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .materia-title:first-child {
+            margin-top: 0;
+        }
+
+        /* --- NOTA CSS: Lista de Actividades --- */
         .task-list {
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 10px;
             margin-bottom: 24px;
         }
 
@@ -201,7 +214,7 @@
             display: flex;
             align-items: center;
             background-color: var(--bg-color);
-            padding: 14px 16px;
+            padding: 12px 14px;
             border-radius: 8px;
             border: 1px solid var(--border-color);
             transition: all 0.2s ease;
@@ -219,11 +232,11 @@
         }
 
         .task-checkbox {
-            width: 20px;
-            height: 20px;
+            width: 18px;
+            height: 18px;
             accent-color: var(--success-color);
             cursor: pointer;
-            margin-right: 14px;
+            margin-right: 12px;
         }
 
         .task-checkbox:disabled {
@@ -233,7 +246,7 @@
         .task-label {
             flex: 1;
             color: var(--text-main);
-            font-size: 0.95rem;
+            font-size: 0.92rem;
         }
 
         .task-item.completed .task-label {
@@ -241,7 +254,7 @@
             color: var(--text-muted);
         }
 
-        /* Botones de Borrado y Footer */
+        /* --- NOTA CSS: Botones de limpieza --- */
         .action-buttons {
             display: flex;
             gap: 10px;
@@ -285,17 +298,17 @@
         <p class="subtitle">Se reinicia automáticamente cada lunes</p>
     </header>
 
-    <!-- Usuario y Bloqueo de 32 Horas -->
+    <!-- NOTA HTML: Sección del nombre del estudiante -->
     <div class="user-section" id="user-box">
         <label class="user-label" for="username-input">Nombre del Usuario / Estudiante:</label>
         <div class="user-input-group">
-            <input type="text" id="username-input" class="user-input" placeholder="Ingresa tu nombre para comenzar..." autocomplete="off">
+            <input type="text" id="username-input" class="user-input" placeholder="Ingresa tu nombre para activar las tareas..." autocomplete="off">
             <button id="user-btn" class="btn" onclick="saveUsername()">Guardar</button>
         </div>
         <span id="lock-timer-text" class="lock-timer" style="display: none;"></span>
     </div>
 
-    <!-- Pestañas para las 4 semanas -->
+    <!-- NOTA HTML: Pestañas para las 4 semanas -->
     <div class="tabs">
         <button class="tab-btn active" onclick="switchWeek(1)">Semana 1</button>
         <button class="tab-btn" onclick="switchWeek(2)">Semana 2</button>
@@ -303,53 +316,116 @@
         <button class="tab-btn" onclick="switchWeek(4)">Semana 4</button>
     </div>
 
-    <!-- Barra de progreso de la semana activa -->
+    <!-- NOTA HTML: Barra de Progreso -->
     <div class="progress-container">
         <div class="progress-header">
             <span>Progreso de la semana</span>
-            <span id="progress-text">0 / 6 completadas</span>
+            <span id="progress-text">0 / 0 completadas</span>
         </div>
         <div class="progress-bar-bg">
             <div class="progress-bar-fill" id="progress-bar"></div>
         </div>
     </div>
 
-    <!-- Lista de las 6 actividades -->
-    <div class="task-list" id="task-list">
-        <!-- Generado dinámicamente -->
-    </div>
+    <!-- NOTA HTML: Aquí se dibujan automáticamente las materias y actividades -->
+    <div class="task-list" id="task-list"></div>
 
-    <!-- Botones para desmarcar actividades tachadas -->
+    <!-- NOTA HTML: Botones para desmarcar actividades tachadas -->
     <div class="action-buttons">
         <button class="btn-clear" onclick="clearWeekTasks()">Borrar tachadas (Esta semana)</button>
         <button class="btn-clear" onclick="clearAllWeeksTasks()">Borrar tachadas (Las 4 semanas)</button>
     </div>
 
-    <!-- Footer / Info de Reajuste -->
     <div class="reset-info">
         <span id="last-reset-text">Lunes activo: --</span>
     </div>
 </div>
 
 <script>
+    // =========================================================================
+    // 📌 MATERIAS OFICIALES DE TU PLAN DE ESTUDIOS
+    // =========================================================================
+    const MATERIAS = [
+        {
+            nombre: "Ética y Cultura Universitaria",
+            actividades: [
+                "Actividad 1",
+                "Actividad 2",
+                "Actividad 3",
+                "Actividad 4",
+                "Actividad 5",
+                "Actividad 6"
+            ]
+        },
+        {
+            nombre: "Educación Física para la Salud y Deporte",
+            actividades: [
+                "Actividad 1",
+                "Actividad 2",
+                "Actividad 3",
+                "Actividad 4",
+                "Actividad 5",
+                "Actividad 6"
+            ]
+        },
+        {
+            nombre: "Geometría Analítica",
+            actividades: [
+                "Actividad 1",
+                "Actividad 2",
+                "Actividad 3",
+                "Actividad 4",
+                "Actividad 5",
+                "Actividad 6"
+            ]
+        },
+        {
+            nombre: "Identidad y Expresión Cultural",
+            actividades: [
+                "Actividad 1",
+                "Actividad 2",
+                "Actividad 3",
+                "Actividad 4",
+                "Actividad 5",
+                "Actividad 6"
+            ]
+        },
+        {
+            nombre: "Matemática I",
+            actividades: [
+                "Actividad 1",
+                "Actividad 2",
+                "Actividad 3",
+                "Actividad 4",
+                "Actividad 5",
+                "Actividad 6"
+            ]
+        },
+        {
+            nombre: "Lógica Matemática",
+            actividades: [
+                "Actividad 1",
+                "Actividad 2",
+                "Actividad 3",
+                "Actividad 4",
+                "Actividad 5",
+                "Actividad 6"
+            ]
+        }
+    ];
+    // --- CONFIGURACIÓN DEL SISTEMA ---
     const TOTAL_WEEKS = 4;
-    const TASKS_PER_WEEK = 6;
     const LOCK_HOURS = 32;
     const LOCK_MS = LOCK_HOURS * 60 * 60 * 1000;
 
     let currentWeek = 1;
 
-    // Estado de la aplicación
+    // --- ESTADO INICIAL DEL ALMACENAMIENTO ---
     let appData = {
         username: "",
         usernameSavedTime: null,
         lastResetMonday: null,
-        weeks: {
-            1: Array.from({length: 6}, (_, i) => ({ text: `Actividad ${i+1}`, completed: false })),
-            2: Array.from({length: 6}, (_, i) => ({ text: `Actividad ${i+1}`, completed: false })),
-            3: Array.from({length: 6}, (_, i) => ({ text: `Actividad ${i+1}`, completed: false })),
-            4: Array.from({length: 6}, (_, i) => ({ text: `Actividad ${i+1}`, completed: false }))
-        }
+        weeks: { 1: {}, 2: {}, 3: {}, 4: {} } // Guarda qué casilla está marcada por semana
     };
 
     function getMostRecentMonday() {
@@ -361,11 +437,11 @@
     }
 
     function saveData() {
-        localStorage.setItem('weekly_tracker_v3', JSON.stringify(appData));
+        localStorage.setItem('weekly_tracker_v4', JSON.stringify(appData));
     }
 
     function loadData() {
-        const saved = localStorage.getItem('weekly_tracker_v3');
+        const saved = localStorage.getItem('weekly_tracker_v4');
         if (saved) {
             try {
                 appData = JSON.parse(saved);
@@ -384,9 +460,8 @@
             appData.lastResetMonday = currentMonday;
             saveData();
         } else if (appData.lastResetMonday !== currentMonday) {
-            for (let w = 1; w <= TOTAL_WEEKS; w++) {
-                appData.weeks[w].forEach(task => task.completed = false);
-            }
+            // Es un nuevo lunes -> Desmarcar todo
+            appData.weeks = { 1: {}, 2: {}, 3: {}, 4: {} };
             appData.lastResetMonday = currentMonday;
             saveData();
         }
@@ -394,7 +469,7 @@
         document.getElementById('last-reset-text').innerText = `Lunes activo: ${appData.lastResetMonday}`;
     }
 
-    /* Nombre de Usuario y Regla de 32 Horas */
+    // --- NOTA JS: Guardar y Bloquear el nombre durante 32 horas ---
     function saveUsername() {
         const input = document.getElementById('username-input');
         const val = input.value.trim();
@@ -408,7 +483,7 @@
         appData.usernameSavedTime = Date.now();
         saveData();
         updateUserSection();
-        renderTasks(); // Reactivar casilla de tareas
+        renderTasks(); // Reactivar interacciones
     }
 
     function updateUserSection() {
@@ -445,7 +520,7 @@
         }
     }
 
-    /* Navegación */
+    /* Navegación entre las 4 semanas */
     function switchWeek(weekNum) {
         currentWeek = weekNum;
         document.querySelectorAll('.tab-btn').forEach((btn, idx) => {
@@ -458,42 +533,56 @@
         renderTasks();
     }
 
-    /* Renderizado de tareas */
+    // --- NOTA JS: Dibuja los módulos y actividades en pantalla ---
     function renderTasks() {
         const container = document.getElementById('task-list');
         container.innerHTML = '';
 
-        const tasks = appData.weeks[currentWeek];
-        let completedCount = 0;
         const hasUser = Boolean(appData.username && appData.username.trim() !== "");
+        let totalCompleted = 0;
+        let totalTasks = 0;
 
-        tasks.forEach((task, index) => {
-            if (task.completed) completedCount++;
+        MATERIAS.forEach((materia, mIdx) => {
+            // Título del Módulo / Materia
+            const mHeader = document.createElement('h3');
+            mHeader.className = 'materia-title';
+            mHeader.innerText = materia.nombre;
+            container.appendChild(mHeader);
 
-            const item = document.createElement('div');
-            item.className = `task-item ${task.completed ? 'completed' : ''} ${!hasUser ? 'disabled' : ''}`;
-            
-            item.onclick = (e) => {
-                if (!hasUser) {
-                    promptRequireUser();
-                    return;
-                }
-                if (e.target.tagName !== 'INPUT') {
-                    toggleTask(index);
-                }
-            };
+            // Actividades
+            materia.actividades.forEach((actText, aIdx) => {
+                totalTasks++;
+                const taskId = `m${mIdx}_a${aIdx}`;
+                const isCompleted = Boolean(appData.weeks[currentWeek] && appData.weeks[currentWeek][taskId]);
+                
+                if (isCompleted) totalCompleted++;
 
-            item.innerHTML = `
-                <input type="checkbox" class="task-checkbox" ${task.completed ? 'checked' : ''} ${!hasUser ? 'disabled' : ''} onchange="toggleTask(${index})">
-                <span class="task-label">${escapeHtml(task.text)}</span>
-            `;
+                const item = document.createElement('div');
+                item.className = `task-item ${isCompleted ? 'completed' : ''} ${!hasUser ? 'disabled' : ''}`;
+                
+                item.onclick = (e) => {
+                    if (!hasUser) {
+                        promptRequireUser();
+                        return;
+                    }
+                    if (e.target.tagName !== 'INPUT') {
+                        toggleTask(taskId);
+                    }
+                };
 
-            container.appendChild(item);
+                item.innerHTML = `
+                    <input type="checkbox" class="task-checkbox" ${isCompleted ? 'checked' : ''} ${!hasUser ? 'disabled' : ''} onchange="toggleTask('${taskId}')">
+                    <span class="task-label">${escapeHtml(actText)}</span>
+                `;
+
+                container.appendChild(item);
+            });
         });
 
-        const percentage = Math.round((completedCount / TASKS_PER_WEEK) * 100);
+        // Actualizar porcentaje
+        const percentage = totalTasks > 0 ? Math.round((totalCompleted / totalTasks) * 100) : 0;
         document.getElementById('progress-bar').style.width = `${percentage}%`;
-        document.getElementById('progress-text').innerText = `${completedCount} / ${TASKS_PER_WEEK} completadas`;
+        document.getElementById('progress-text').innerText = `${totalCompleted} / ${totalTasks} completadas`;
     }
 
     function promptRequireUser() {
@@ -504,30 +593,33 @@
         setTimeout(() => box.classList.remove('error-highlight'), 2000);
     }
 
-    function toggleTask(index) {
+    function toggleTask(taskId) {
         if (!appData.username || appData.username.trim() === "") {
             promptRequireUser();
             return;
         }
-        appData.weeks[currentWeek][index].completed = !appData.weeks[currentWeek][index].completed;
+
+        if (!appData.weeks[currentWeek]) {
+            appData.weeks[currentWeek] = {};
+        }
+
+        appData.weeks[currentWeek][taskId] = !appData.weeks[currentWeek][taskId];
         saveData();
         renderTasks();
     }
 
-    /* Botones de Borrado */
+    // --- NOTA JS: Funciones de Limpieza ---
     function clearWeekTasks() {
-        if (confirm(`¿Quieres desmarcar todas las tareas tachadas únicamente de la Semana ${currentWeek}?`)) {
-            appData.weeks[currentWeek].forEach(task => task.completed = false);
+        if (confirm(`¿Quieres desmarcar todas las tareas tachadas de la Semana ${currentWeek}?`)) {
+            appData.weeks[currentWeek] = {};
             saveData();
             renderTasks();
         }
     }
 
     function clearAllWeeksTasks() {
-        if (confirm(`¿Quieres desmarcar TODAS las actividades tachadas de las 4 semanas?`)) {
-            for (let w = 1; w <= TOTAL_WEEKS; w++) {
-                appData.weeks[w].forEach(task => task.completed = false);
-            }
+        if (confirm(`¿Quieres desmarcar TODAS las actividades de las 4 semanas?`)) {
+            appData.weeks = { 1: {}, 2: {}, 3: {}, 4: {} };
             saveData();
             renderTasks();
         }
@@ -537,9 +629,10 @@
         return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
     }
 
-    // Actualización continua del timer en tiempo real
+    // Comprobación periódica para el reloj de 32h
     setInterval(updateUserSection, 60000);
 
+    // Inicializar
     loadData();
     renderTasks();
 </script>
