@@ -3,478 +3,546 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mi planificador</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome Icons CDN -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Font Inter -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        brand: {
-                            50: '#f0f9ff',
-                            100: '#e0f2fe',
-                            500: '#0284c7',
-                            600: '#0284c7',
-                            700: '#0369a1',
-                        }
-                    },
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                    }
-                }
-            }
-        }
-    </script>
+    <title>Seguidor de Actividades Semanales</title>
     <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent-color: #3b82f6;
+            --accent-hover: #2563eb;
+            --success-color: #22c55e;
+            --danger-color: #ef4444;
+            --border-color: #334155;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
         body {
-            font-family: 'Inter', sans-serif;
-            transition: background-color 0.3s, color 0.3s;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
         }
-        .task-checkbox:checked + label .task-text {
+
+        .container {
+            width: 100%;
+            max-width: 650px;
+            background-color: var(--card-bg);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border-color);
+        }
+
+        header {
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            margin-bottom: 6px;
+            color: #fff;
+        }
+
+        p.subtitle {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+
+        /* Sección de Nombre de Usuario */
+        .user-section {
+            background-color: var(--bg-color);
+            padding: 16px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 20px;
+            transition: border-color 0.3s ease;
+        }
+
+        .user-section.error-highlight {
+            border-color: var(--danger-color);
+            box-shadow: 0 0 10px rgba(239, 68, 68, 0.3);
+        }
+
+        .user-label {
+            display: block;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+
+        .user-input-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .user-input {
+            flex: 1;
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            outline: none;
+        }
+
+        .user-input:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        .btn {
+            background-color: var(--accent-color);
+            color: #fff;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .btn:hover:not(:disabled) {
+            background-color: var(--accent-hover);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .lock-timer {
+            font-size: 0.78rem;
+            color: var(--danger-color);
+            margin-top: 8px;
+            display: block;
+        }
+
+        /* Pestañas de Semanas */
+        .tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            background-color: var(--bg-color);
+            padding: 6px;
+            border-radius: 10px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 10px 0;
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .tab-btn.active {
+            background-color: var(--accent-color);
+            color: #fff;
+        }
+
+        .tab-btn:hover:not(.active) {
+            color: var(--text-main);
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        /* Progreso */
+        .progress-container {
+            margin-bottom: 24px;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.875rem;
+            margin-bottom: 8px;
+            color: var(--text-muted);
+        }
+
+        .progress-bar-bg {
+            width: 100%;
+            height: 10px;
+            background-color: var(--bg-color);
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            width: 0%;
+            background-color: var(--success-color);
+            transition: width 0.3s ease;
+        }
+
+        /* Lista de Tareas */
+        .task-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .task-item {
+            display: flex;
+            align-items: center;
+            background-color: var(--bg-color);
+            padding: 14px 16px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            transition: all 0.2s ease;
+            user-select: none;
+            cursor: pointer;
+        }
+
+        .task-item.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .task-item:hover:not(.disabled) {
+            border-color: #475569;
+        }
+
+        .task-checkbox {
+            width: 20px;
+            height: 20px;
+            accent-color: var(--success-color);
+            cursor: pointer;
+            margin-right: 14px;
+        }
+
+        .task-checkbox:disabled {
+            cursor: not-allowed;
+        }
+
+        .task-label {
+            flex: 1;
+            color: var(--text-main);
+            font-size: 0.95rem;
+        }
+
+        .task-item.completed .task-label {
             text-decoration: line-through;
-            opacity: 0.6;
+            color: var(--text-muted);
         }
-        .custom-scrollbar::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
+
+        /* Botones de Borrado y Footer */
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
         }
-        .custom-scrollbar::-webkit-scrollbar-track {
-            background: transparent;
+
+        .btn-clear {
+            flex: 1;
+            background-color: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-muted);
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
         }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-            background: rgba(156, 163, 175, 0.4);
-            border-radius: 9999px;
+
+        .btn-clear:hover {
+            border-color: var(--danger-color);
+            color: var(--danger-color);
         }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-            background: rgba(156, 163, 175, 0.7);
+
+        .reset-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            border-top: 1px solid var(--border-color);
+            padding-top: 16px;
         }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-800 dark:bg-slate-900 dark:text-slate-100 min-h-screen flex flex-col transition-colors duration-200">
+<body>
 
-    <!-- Header -->
-    <header class="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 sticky top-0 z-30 shadow-sm transition-colors duration-200">
-        <div class="max-w-6xl mx-auto px-4 py-3 sm:px-6 flex flex-col sm:flex-row justify-between items-center gap-3">
-            <div class="flex items-center space-x-3">
-                <div class="p-2 bg-sky-500/10 text-sky-600 dark:text-sky-400 rounded-xl">
-                    <i class="fa-solid fa-calendar-check text-2xl"></i>
-                </div>
-                <div>
-                    <h1 class="text-xl font-bold tracking-tight">Gestor de Tareas Semanales</h1>
-                    <p class="text-xs text-slate-500 dark:text-slate-400">Ciclo de 4 Semanas • Reinicio Automático los Lunes</p>
-                </div>
-            </div>
-
-            <!-- Controls (Theme Toggle & Reset All) -->
-            <div class="flex items-center space-x-2 w-full sm:w-auto justify-end">
-                <button id="themeToggleBtn" onclick="toggleDarkMode()" class="p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-700/50 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition-all text-sm flex items-center gap-2">
-                    <i class="fa-solid fa-moon dark:hidden"></i>
-                    <i class="fa-solid fa-sun hidden dark:inline"></i>
-                    <span class="text-xs font-medium sm:hidden dark:hidden">Modo Oscuro</span>
-                    <span class="text-xs font-medium sm:hidden hidden dark:inline">Modo Claro</span>
-                </button>
-                <button onclick="confirmResetAll()" class="px-3 py-2 rounded-xl border border-red-200 dark:border-red-900/40 bg-red-50 dark:bg-red-950/30 hover:bg-red-100 dark:hover:bg-red-900/50 text-red-600 dark:text-red-400 transition-all text-xs font-medium flex items-center gap-1.5">
-                    <i class="fa-solid fa-rotate text-xs"></i>
-                    <span>Reiniciar Todo</span>
-                </button>
-            </div>
-        </div>
+<div class="container">
+    <header>
+        <h1>Control de Actividades Semanales</h1>
+        <p class="subtitle">Se reinicia automáticamente cada lunes</p>
     </header>
 
-    <!-- Main Content Container -->
-    <main class="max-w-6xl mx-auto px-4 py-6 sm:px-6 flex-grow w-full space-y-6">
-
-        <!-- Info & Status Banner -->
-        <div class="bg-white dark:bg-slate-800 rounded-2xl p-4 sm:p-5 border border-slate-200/80 dark:border-slate-700/80 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4 transition-colors duration-200">
-            <div class="flex items-start sm:items-center gap-3">
-                <div class="p-3 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 rounded-xl mt-0.5 sm:mt-0">
-                    <i class="fa-solid fa-clock-rotate-left text-lg"></i>
-                </div>
-                <div>
-                    <div class="flex flex-wrap items-center gap-2">
-                        <span id="currentDateText" class="font-semibold text-slate-800 dark:text-slate-100 text-sm sm:text-base">Cargando fecha...</span>
-                        <span id="mondayBadge" class="hidden px-2 py-0.5 text-xs font-semibold rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-900/50 dark:text-emerald-300">
-                            ¡Hoy es Lunes! (Reinicio Automático)
-                        </span>
-                    </div>
-                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5" id="nextResetText">
-                        Próximo reinicio automático: --
-                    </p>
-                </div>
-            </div>
-
-            <!-- Global Cycle Progress Summary -->
-            <div class="w-full md:w-auto bg-slate-50 dark:bg-slate-700/40 p-3 rounded-xl border border-slate-100 dark:border-slate-700 flex items-center justify-between gap-4">
-                <div>
-                    <span class="text-xs text-slate-500 dark:text-slate-400 font-medium block">Progreso Total del Ciclo</span>
-                    <span id="overallProgressText" class="text-sm font-bold text-slate-800 dark:text-slate-200">0 / 24 Completadas</span>
-                </div>
-                <div class="w-24 bg-slate-200 dark:bg-slate-600 rounded-full h-2.5 overflow-hidden">
-                    <div id="overallProgressBar" class="bg-sky-500 h-2.5 rounded-full transition-all duration-300" style="width: 0%"></div>
-                </div>
-            </div>
+    <!-- Usuario y Bloqueo de 32 Horas -->
+    <div class="user-section" id="user-box">
+        <label class="user-label" for="username-input">Nombre del Usuario / Estudiante:</label>
+        <div class="user-input-group">
+            <input type="text" id="username-input" class="user-input" placeholder="Ingresa tu nombre para comenzar..." autocomplete="off">
+            <button id="user-btn" class="btn" onclick="saveUsername()">Guardar</button>
         </div>
+        <span id="lock-timer-text" class="lock-timer" style="display: none;"></span>
+    </div>
 
-        <!-- Week Selector Tabs -->
-        <div class="flex space-x-2 border-b border-slate-200 dark:border-slate-700 overflow-x-auto pb-1 custom-scrollbar">
-            <button onclick="switchWeek(1)" id="tab-1" class="tab-btn px-4 py-2.5 rounded-t-xl font-medium text-sm flex items-center gap-2 whitespace-nowrap transition-all border-b-2 border-transparent">
-                <span>Semana 1</span>
-                <span id="badge-week-1" class="px-2 py-0.5 text-xs rounded-full bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300">0/6</span>
-            </button>
-            <button onclick="switchWeek(2)" id="tab-2" class="tab-btn px-4 py-2.5 rounded-t-xl font-medium text-sm flex items-center gap-2 whitespace-nowrap transition-all border-b-2 border-transparent">
-                <span>Semana 2</span>
-                <span id="badge-week-2" class="px-2 py-0.5 text-xs rounded-full bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300">0/6</span>
-            </button>
-            <button onclick="switchWeek(3)" id="tab-3" class="tab-btn px-4 py-2.5 rounded-t-xl font-medium text-sm flex items-center gap-2 whitespace-nowrap transition-all border-b-2 border-transparent">
-                <span>Semana 3</span>
-                <span id="badge-week-3" class="px-2 py-0.5 text-xs rounded-full bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300">0/6</span>
-            </button>
-            <button onclick="switchWeek(4)" id="tab-4" class="tab-btn px-4 py-2.5 rounded-t-xl font-medium text-sm flex items-center gap-2 whitespace-nowrap transition-all border-b-2 border-transparent">
-                <span>Semana 4</span>
-                <span id="badge-week-4" class="px-2 py-0.5 text-xs rounded-full bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300">0/6</span>
-            </button>
+    <!-- Pestañas para las 4 semanas -->
+    <div class="tabs">
+        <button class="tab-btn active" onclick="switchWeek(1)">Semana 1</button>
+        <button class="tab-btn" onclick="switchWeek(2)">Semana 2</button>
+        <button class="tab-btn" onclick="switchWeek(3)">Semana 3</button>
+        <button class="tab-btn" onclick="switchWeek(4)">Semana 4</button>
+    </div>
+
+    <!-- Barra de progreso de la semana activa -->
+    <div class="progress-container">
+        <div class="progress-header">
+            <span>Progreso de la semana</span>
+            <span id="progress-text">0 / 6 completadas</span>
         </div>
-
-        <!-- Active Week Detail View -->
-        <div class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 shadow-sm p-5 sm:p-6 transition-colors duration-200 space-y-6">
-            
-            <!-- Week Header & Progress Bar -->
-            <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-4 pb-4 border-b border-slate-100 dark:border-slate-700/60">
-                <div>
-                    <h2 id="currentWeekTitle" class="text-lg font-bold text-slate-800 dark:text-slate-100">Semana 1 de 4</h2>
-                    <p class="text-xs text-slate-500 dark:text-slate-400">Haz clic en el lápiz para editar el nombre de cualquier actividad.</p>
-                </div>
-                
-                <div class="flex items-center gap-3">
-                    <button onclick="resetCurrentWeek()" class="px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-700/50 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 text-xs font-medium flex items-center gap-1.5 transition-colors">
-                        <i class="fa-solid fa-arrow-rotate-left text-slate-400"></i>
-                        <span>Limpiar esta semana</span>
-                    </button>
-                </div>
-            </div>
-
-            <!-- Single Week Progress Bar -->
-            <div class="space-y-1.5">
-                <div class="flex justify-between items-center text-xs font-medium">
-                    <span id="weekProgressCount" class="text-slate-600 dark:text-slate-300">0 de 6 completadas</span>
-                    <span id="weekProgressPercent" class="text-sky-600 dark:text-sky-400 font-bold">0%</span>
-                </div>
-                <div class="w-full bg-slate-100 dark:bg-slate-700 rounded-full h-3 overflow-hidden p-0.5">
-                    <div id="weekProgressBar" class="bg-sky-500 h-2 rounded-full transition-all duration-300 ease-out" style="width: 0%"></div>
-                </div>
-            </div>
-
-            <!-- Tasks List (6 Activities) -->
-            <div id="tasksContainer" class="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2">
-                <!-- Dynamically populated tasks -->
-            </div>
+        <div class="progress-bar-bg">
+            <div class="progress-bar-fill" id="progress-bar"></div>
         </div>
+    </div>
 
-    </main>
+    <!-- Lista de las 6 actividades -->
+    <div class="task-list" id="task-list">
+        <!-- Generado dinámicamente -->
+    </div>
 
-    <!-- Footer -->
-    <footer class="mt-auto py-4 border-t border-slate-200 dark:border-slate-800 text-center text-xs text-slate-400 dark:text-slate-500">
-        <p>Los datos se guardan de forma local en tu navegador. Tus cambios no se perderán al cerrar la página.</p>
-    </footer>
+    <!-- Botones para desmarcar actividades tachadas -->
+    <div class="action-buttons">
+        <button class="btn-clear" onclick="clearWeekTasks()">Borrar tachadas (Esta semana)</button>
+        <button class="btn-clear" onclick="clearAllWeeksTasks()">Borrar tachadas (Las 4 semanas)</button>
+    </div>
 
-    <script>
-        // Default Tasks Structure (4 Weeks x 6 Tasks)
-        const DEFAULT_TASKS = [
-            "Etica y cultura universitaria",
-            "Educacion Fisica para la Salud y deporte",
-            "Geometria analitica",
-            "Identidad y expresion cultural",
-            "Matematica I",
-            "Logica Matematica"
-        ];
+    <!-- Footer / Info de Reajuste -->
+    <div class="reset-info">
+        <span id="last-reset-text">Lunes activo: --</span>
+    </div>
+</div>
 
-        // Application State
-        let appData = {
-            activeWeek: 1,
-            lastResetMonday: null, // YYYY-MM-DD of last processed reset
-            weeks: {
-                1: createInitialWeekTasks(),
-                2: createInitialWeekTasks(),
-                3: createInitialWeekTasks(),
-                4: createInitialWeekTasks()
-            }
-        };
+<script>
+    const TOTAL_WEEKS = 4;
+    const TASKS_PER_WEEK = 6;
+    const LOCK_HOURS = 32;
+    const LOCK_MS = LOCK_HOURS * 60 * 60 * 1000;
 
-        function createInitialWeekTasks() {
-            return DEFAULT_TASKS.map((name, index) => ({
-                id: index + 1,
-                name: name,
-                completed: false
-            }));
+    let currentWeek = 1;
+
+    // Estado de la aplicación
+    let appData = {
+        username: "",
+        usernameSavedTime: null,
+        lastResetMonday: null,
+        weeks: {
+            1: Array.from({length: 6}, (_, i) => ({ text: `Actividad ${i+1}`, completed: false })),
+            2: Array.from({length: 6}, (_, i) => ({ text: `Actividad ${i+1}`, completed: false })),
+            3: Array.from({length: 6}, (_, i) => ({ text: `Actividad ${i+1}`, completed: false })),
+            4: Array.from({length: 6}, (_, i) => ({ text: `Actividad ${i+1}`, completed: false }))
         }
+    };
 
-        // --- Date Helper Functions ---
-        
-        // Returns YYYY-MM-DD for the Monday of the current week
-        function getMondayOfCurrentWeek(d) {
-            const date = new Date(d);
-            const day = date.getDay();
-            // diff = current date - day number + (1 if Sunday to adjust week)
-            const diff = date.getDate() - day + (day === 0 ? -6 : 1);
-            const monday = new Date(date.setDate(diff));
-            monday.setHours(0, 0, 0, 0);
-            
-            const year = monday.getFullYear();
-            const month = String(monday.getMonth() + 1).padStart(2, '0');
-            const dayStr = String(monday.getDate()).padStart(2, '0');
-            return `${year}-${month}-${dayStr}`;
-        }
+    function getMostRecentMonday() {
+        const now = new Date();
+        const day = now.getDay();
+        const diff = now.getDate() - day + (day === 0 ? -6 : 1);
+        const monday = new Date(now.setDate(diff));
+        return monday.toISOString().split('T')[0];
+    }
 
-        function formatDisplayDate(date) {
-            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-            const formatted = date.toLocaleDateString('es-ES', options);
-            return formatted.charAt(0).toUpperCase() + formatted.slice(1);
-        }
+    function saveData() {
+        localStorage.setItem('weekly_tracker_v3', JSON.stringify(appData));
+    }
 
-        function getNextMondayFormatted() {
-            const today = new Date();
-            const day = today.getDay();
-            const daysUntilNextMonday = day === 0 ? 1 : (8 - day);
-            
-            const nextMonday = new Date(today);
-            nextMonday.setDate(today.getDate() + daysUntilNextMonday);
-            
-            return nextMonday.toLocaleDateString('es-ES', { weekday: 'short', month: 'short', day: 'numeric' });
-        }
-
-        // --- Storage Management ---
-
-        function loadData() {
-            const saved = localStorage.getItem('weeklyTaskTrackerData');
-            if (saved) {
-                try {
-                    appData = JSON.parse(saved);
-                } catch(e) {
-                    console.error("Error cargando datos:", e);
-                }
+    function loadData() {
+        const saved = localStorage.getItem('weekly_tracker_v3');
+        if (saved) {
+            try {
+                appData = JSON.parse(saved);
+            } catch(e) {
+                console.error("Error al cargar los datos guardados");
             }
         }
+        checkMondayReset();
+        updateUserSection();
+    }
 
-        function saveData() {
-            localStorage.setItem('weeklyTaskTrackerData', JSON.stringify(appData));
-        }
+    function checkMondayReset() {
+        const currentMonday = getMostRecentMonday();
 
-        function checkMondayAutoReset() {
-            const today = new Date();
-            const currentMondayStr = getMondayOfCurrentWeek(today);
-
-            if (appData.lastResetMonday !== currentMondayStr) {
-                // Perform Monday Reset: Clear all completed checkboxes for all weeks
-                for (let w = 1; w <= 4; w++) {
-                    appData.weeks[w].forEach(task => {
-                        task.completed = false;
-                    });
-                }
-                // Update last reset Monday reference
-                appData.lastResetMonday = currentMondayStr;
-                saveData();
-                showNotification("¡Las tareas se han desmarcado para iniciar la nueva semana!");
-            }
-        }
-
-        // --- UI Rendering ---
-
-        function updateDateAndBanner() {
-            const today = new Date();
-            document.getElementById('currentDateText').innerText = formatDisplayDate(today);
-
-            if (today.getDay() === 1) {
-                document.getElementById('mondayBadge').classList.remove('hidden');
-            } else {
-                document.getElementById('mondayBadge').classList.add('hidden');
-            }
-
-            document.getElementById('nextResetText').innerText = `Próximo reinicio automático: Lunes, ${getNextMondayFormatted()}`;
-        }
-
-        function switchWeek(weekNum) {
-            appData.activeWeek = weekNum;
+        if (!appData.lastResetMonday) {
+            appData.lastResetMonday = currentMonday;
             saveData();
-            renderUI();
-        }
-
-        function renderUI() {
-            renderTabs();
-            renderWeekDetails();
-            renderOverallProgress();
-        }
-
-        function renderTabs() {
-            for (let w = 1; w <= 4; w++) {
-                const btn = document.getElementById(`tab-${w}`);
-                const badge = document.getElementById(`badge-week-${w}`);
-                
-                const tasks = appData.weeks[w];
-                const completedCount = tasks.filter(t => t.completed).length;
-
-                badge.innerText = `${completedCount}/6`;
-
-                if (w === appData.activeWeek) {
-                    btn.className = "tab-btn px-4 py-2.5 rounded-t-xl font-semibold text-sm flex items-center gap-2 whitespace-nowrap transition-all border-b-2 border-sky-500 bg-sky-50 dark:bg-sky-950/30 text-sky-600 dark:text-sky-400";
-                    badge.className = "px-2 py-0.5 text-xs rounded-full bg-sky-100 text-sky-700 dark:bg-sky-900/60 dark:text-sky-300 font-bold";
-                } else {
-                    btn.className = "tab-btn px-4 py-2.5 rounded-t-xl font-medium text-sm flex items-center gap-2 whitespace-nowrap transition-all border-b-2 border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 hover:bg-slate-100/50 dark:hover:bg-slate-800/50";
-                    badge.className = "px-2 py-0.5 text-xs rounded-full bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300";
-                }
+        } else if (appData.lastResetMonday !== currentMonday) {
+            for (let w = 1; w <= TOTAL_WEEKS; w++) {
+                appData.weeks[w].forEach(task => task.completed = false);
             }
+            appData.lastResetMonday = currentMonday;
+            saveData();
         }
 
-        function renderWeekDetails() {
-            const currentWeek = appData.activeWeek;
-            const tasks = appData.weeks[currentWeek];
-            const completedCount = tasks.filter(t => t.completed).length;
-            const percentage = Math.round((completedCount / tasks.length) * 100);
+        document.getElementById('last-reset-text').innerText = `Lunes activo: ${appData.lastResetMonday}`;
+    }
 
-            // Update Header & Progress Bar
-            document.getElementById('currentWeekTitle').innerText = `Semana ${currentWeek} de 4`;
-            document.getElementById('weekProgressCount').innerText = `${completedCount} de ${tasks.length} actividades completadas`;
-            document.getElementById('weekProgressPercent').innerText = `${percentage}%`;
-            document.getElementById('weekProgressBar').style.width = `${percentage}%`;
+    /* Nombre de Usuario y Regla de 32 Horas */
+    function saveUsername() {
+        const input = document.getElementById('username-input');
+        const val = input.value.trim();
 
-            // Render Tasks List
-            const container = document.getElementById('tasksContainer');
-            container.innerHTML = '';
-
-            tasks.forEach((task, index) => {
-                const taskCard = document.createElement('div');
-                taskCard.className = `group flex items-center justify-between p-3.5 rounded-xl border transition-all duration-200 ${
-                    task.completed 
-                    ? 'bg-slate-50/80 dark:bg-slate-900/40 border-slate-200 dark:border-slate-800' 
-                    : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 hover:border-sky-300 dark:hover:border-sky-700 shadow-sm'
-                }`;
-
-                taskCard.innerHTML = `
-                    <div class="flex items-center space-x-3 flex-grow min-w-0 mr-2">
-                        <input 
-                            type="checkbox" 
-                            id="task-${currentWeek}-${task.id}" 
-                            ${task.completed ? 'checked' : ''} 
-                            onchange="toggleTask(${currentWeek}, ${task.id})"
-                            class="task-checkbox h-5 w-5 rounded border-slate-300 dark:border-slate-600 text-sky-600 focus:ring-sky-500 dark:bg-slate-700 dark:checked:bg-sky-500 cursor-pointer accent-sky-600 transition-transform active:scale-95"
-                        />
-                        <label for="task-${currentWeek}-${task.id}" class="cursor-pointer flex-grow min-w-0 select-none">
-                            <span class="task-text text-sm font-medium transition-all text-slate-700 dark:text-slate-200 block truncate ${task.completed ? 'line-through text-slate-400 dark:text-slate-500' : ''}">
-                                ${escapeHtml(task.name)}
-                            </span>
-                        </label>
-                    </div>
-                    <button 
-                        onclick="editTaskName(${currentWeek}, ${task.id})" 
-                        title="Editar actividad"
-                        class="opacity-0 group-hover:opacity-100 focus:opacity-100 text-slate-400 hover:text-sky-600 dark:hover:text-sky-400 p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-all text-xs flex-shrink-0"
-                    >
-                        <i class="fa-solid fa-pen"></i>
-                    </button>
-                `;
-                container.appendChild(taskCard);
-            });
+        if (!val) {
+            alert("Por favor ingresa un nombre válido.");
+            return;
         }
 
-        function renderOverallProgress() {
-            let totalTasks = 0;
-            let totalCompleted = 0;
+        appData.username = val;
+        appData.usernameSavedTime = Date.now();
+        saveData();
+        updateUserSection();
+        renderTasks(); // Reactivar casilla de tareas
+    }
 
-            for (let w = 1; w <= 4; w++) {
-                const tasks = appData.weeks[w];
-                totalTasks += tasks.length;
-                totalCompleted += tasks.filter(t => t.completed).length;
-            }
+    function updateUserSection() {
+        const input = document.getElementById('username-input');
+        const btn = document.getElementById('user-btn');
+        const timerText = document.getElementById('lock-timer-text');
 
-            const percentage = Math.round((totalCompleted / totalTasks) * 100);
-            document.getElementById('overallProgressText').innerText = `${totalCompleted} / ${totalTasks} Completadas`;
-            document.getElementById('overallProgressBar').style.width = `${percentage}%`;
+        if (!appData.username) {
+            input.value = "";
+            input.disabled = false;
+            btn.disabled = false;
+            timerText.style.display = "none";
+            return;
         }
 
+        input.value = appData.username;
+        const now = Date.now();
+        const elapsed = now - (appData.usernameSavedTime || 0);
 
-        function toggleTask(weekNum, taskId) {
-            const task = appData.weeks[weekNum].find(t => t.id === taskId);
-            if (task) {
-                task.completed = !task.completed;
-                saveData();
-                renderUI();
-            }
+        if (elapsed < LOCK_MS) {
+            input.disabled = true;
+            btn.disabled = true;
+            timerText.style.display = "block";
+            
+            const remaining = LOCK_MS - elapsed;
+            const hours = Math.floor(remaining / (1000 * 60 * 60));
+            const minutes = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
+            timerText.innerText = `🔒 Bloqueado: Podrás editar tu nombre nuevamente en ${hours}h ${minutes}m.`;
+        } else {
+            input.disabled = false;
+            btn.disabled = false;
+            btn.innerText = "Actualizar";
+            timerText.style.display = "none";
         }
+    }
 
-        function editTaskName(weekNum, taskId) {
-            const task = appData.weeks[weekNum].find(t => t.id === taskId);
-            if (!task) return;
-
-            const newName = prompt("Ingresa el nuevo nombre para esta actividad:", task.name);
-            if (newName !== null && newName.trim() !== "") {
-                task.name = newName.trim();
-                saveData();
-                renderUI();
-            }
-        }
-
-        function resetCurrentWeek() {
-            if (confirm(`¿Deseas desmarcar todas las tareas de la Semana ${appData.activeWeek}?`)) {
-                appData.weeks[appData.activeWeek].forEach(t => t.completed = false);
-                saveData();
-                renderUI();
-            }
-        }
-
-        function confirmResetAll() {
-            if (confirm("¿Desmarcaras TODAS las tareas de las 4 semanas?")) {
-                for (let w = 1; w <= 4; w++) {
-                    appData.weeks[w].forEach(t => t.completed = false);
-                }
-                saveData();
-                renderUI();
-            }
-        }
-
-        // --- Utility Helpers ---
-
-        function escapeHtml(text) {
-            const div = document.createElement('div');
-            div.innerText = text;
-            return div.innerHTML;
-        }
-
-        function showNotification(msg) {
-            const toast = document.createElement('div');
-            toast.className = 'fixed bottom-4 right-4 bg-slate-800 text-white px-4 py-3 rounded-xl shadow-lg text-sm flex items-center gap-2 z-50 border border-slate-700 animate-bounce';
-            toast.innerHTML = `<i class="fa-solid fa-circle-info text-sky-400"></i><span>${msg}</span>`;
-            document.body.appendChild(toast);
-            setTimeout(() => toast.remove(), 4000);
-        }
-
-        // Theme Toggle
-        function toggleDarkMode() {
-            document.documentElement.classList.toggle('dark');
-            const isDark = document.documentElement.classList.contains('dark');
-            localStorage.setItem('theme', isDark ? 'dark' : 'light');
-        }
-
-        function initTheme() {
-            const savedTheme = localStorage.getItem('theme');
-            if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-                document.documentElement.classList.add('dark');
+    /* Navegación */
+    function switchWeek(weekNum) {
+        currentWeek = weekNum;
+        document.querySelectorAll('.tab-btn').forEach((btn, idx) => {
+            if (idx + 1 === weekNum) {
+                btn.classList.add('active');
             } else {
-                document.documentElement.classList.remove('dark');
+                btn.classList.remove('active');
             }
-        }
+        });
+        renderTasks();
+    }
 
-        window.onload = function() {
-            initTheme();
-            loadData();
-            checkMondayAutoReset();
-            updateDateAndBanner();
-            renderUI();
-        };
-    </script>
+    /* Renderizado de tareas */
+    function renderTasks() {
+        const container = document.getElementById('task-list');
+        container.innerHTML = '';
+
+        const tasks = appData.weeks[currentWeek];
+        let completedCount = 0;
+        const hasUser = Boolean(appData.username && appData.username.trim() !== "");
+
+        tasks.forEach((task, index) => {
+            if (task.completed) completedCount++;
+
+            const item = document.createElement('div');
+            item.className = `task-item ${task.completed ? 'completed' : ''} ${!hasUser ? 'disabled' : ''}`;
+            
+            item.onclick = (e) => {
+                if (!hasUser) {
+                    promptRequireUser();
+                    return;
+                }
+                if (e.target.tagName !== 'INPUT') {
+                    toggleTask(index);
+                }
+            };
+
+            item.innerHTML = `
+                <input type="checkbox" class="task-checkbox" ${task.completed ? 'checked' : ''} ${!hasUser ? 'disabled' : ''} onchange="toggleTask(${index})">
+                <span class="task-label">${escapeHtml(task.text)}</span>
+            `;
+
+            container.appendChild(item);
+        });
+
+        const percentage = Math.round((completedCount / TASKS_PER_WEEK) * 100);
+        document.getElementById('progress-bar').style.width = `${percentage}%`;
+        document.getElementById('progress-text').innerText = `${completedCount} / ${TASKS_PER_WEEK} completadas`;
+    }
+
+    function promptRequireUser() {
+        const box = document.getElementById('user-box');
+        box.classList.add('error-highlight');
+        document.getElementById('username-input').focus();
+        alert("⚠️ Debes colocar y guardar tu nombre antes de poder tachar alguna actividad.");
+        setTimeout(() => box.classList.remove('error-highlight'), 2000);
+    }
+
+    function toggleTask(index) {
+        if (!appData.username || appData.username.trim() === "") {
+            promptRequireUser();
+            return;
+        }
+        appData.weeks[currentWeek][index].completed = !appData.weeks[currentWeek][index].completed;
+        saveData();
+        renderTasks();
+    }
+
+    /* Botones de Borrado */
+    function clearWeekTasks() {
+        if (confirm(`¿Quieres desmarcar todas las tareas tachadas únicamente de la Semana ${currentWeek}?`)) {
+            appData.weeks[currentWeek].forEach(task => task.completed = false);
+            saveData();
+            renderTasks();
+        }
+    }
+
+    function clearAllWeeksTasks() {
+        if (confirm(`¿Quieres desmarcar TODAS las actividades tachadas de las 4 semanas?`)) {
+            for (let w = 1; w <= TOTAL_WEEKS; w++) {
+                appData.weeks[w].forEach(task => task.completed = false);
+            }
+            saveData();
+            renderTasks();
+        }
+    }
+
+    function escapeHtml(text) {
+        return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+
+    // Actualización continua del timer en tiempo real
+    setInterval(updateUserSection, 60000);
+
+    loadData();
+    renderTasks();
+</script>
+
 </body>
 </html>
